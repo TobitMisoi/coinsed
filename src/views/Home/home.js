@@ -9,8 +9,9 @@ import {
   Typography,
   Collapse,
   Button,
-  IconButton,
   ListSubheader,
+  CardActions,
+  Skeleton,
 } from "@mui/material";
 import { DataGrid } from "@mui/x-data-grid";
 import React from "react";
@@ -46,15 +47,11 @@ function Home() {
       try {
         resp = await getData(`/currencies`);
         const trendingData = await getData(
-          `/v1/cryptocurrency/trending/latest?limit=20`
-        );
-
-        const pricePerformanceStatsId = trendingData.data["data"].data.map(
-          (i) => i.id
+          `/v1/cryptocurrency/quotes/latest?id=1,1027,825,1839,3408,2010,52,5426,4172,74`
         );
 
         const pricePerformanceStats = await getData(
-          `/v1/exchange/info?id=${pricePerformanceStatsId}`
+          `/v1/cryptocurrency/listings/latest`
         );
 
         var tsYesterday = new Date(Date.now() - 86400 * 1000).toISOString();
@@ -72,7 +69,7 @@ function Home() {
 
         setPricePerformanceStats(pricePerformanceStats.data["data"]);
 
-        setTrending(trendingData.data["data"].data);
+        setTrending(trendingData.data["data"]);
       } catch (error) {
         console.log(error);
       }
@@ -83,7 +80,7 @@ function Home() {
     };
 
     fetchData();
-  // eslint-disable-next-line react-hooks/exhaustive-deps
+    // eslint-disable-next-line react-hooks/exhaustive-deps
   }, []);
 
   const [open, setOpen] = React.useState(false);
@@ -183,7 +180,7 @@ function Home() {
         >
           <br />
           <Grid container spacing={1}>
-            <Grid item xs={12} md={6}>
+            {/* <Grid item xs={12} md={6}>
               <Box
                 pt={4}
                 sx={{
@@ -205,19 +202,27 @@ function Home() {
                   Start Trading
                 </Button>
               </Box>
-            </Grid>
+            </Grid> */}
             <Grid
               sx={{ position: "relative" }}
               display='flex'
               alignItems='center'
               item
-              xs={12}
-              md={6}
+              lg={12}
+              // md={6}
             >
               {/* <Hidden mdDown> */}
               <Divider orientation='vertical' />
               {/* </Hidden> */}
-              <Box m={2} pt={4} sx={{ width: "100%" }}>
+              <Box m={2} pt={4} sx={{ width: "100%", textAlign: "center" }}>
+                <Typography variant='code'>0% commision</Typography>
+                <Typography variant='h2' p={1}>
+                  Join the best Crypto currency exchange
+                </Typography>
+                <Typography mb={5}>
+                  Start trading with over 740 different cryptocurrency and fiat
+                  currency pairs, including Bitcoin, Ethereum and BNB pairs
+                </Typography>
                 <Card
                   elevation={2}
                   sx={{
@@ -229,45 +234,85 @@ function Home() {
                     <List
                       sx={{
                         width: "100%",
-                        maxWidth: 360,
                       }}
                       subheader={
                         <ListSubheader
                           component='div'
                           aria-labelledby='trending-sub-header'
                           id='trending-sub-header'
+                          sx={{ fontWeight: "bold" }}
                         >
-                          Trending
+                          Top picks
                         </ListSubheader>
                       }
                     >
-                      {trending.length &&
-                        trending.slice(0, 3).map((i) => (
-                          <ListItem key={i.id}>
-                            <Typography>{i.name}</Typography>
-                            <Typography variant='code'>{i.cmc_rank}</Typography>
-                          </ListItem>
-                        ))}
+                      {Object.values(trending).length > 0 ? (
+                        Object.values(trending)
+                          .slice(0, 3)
+                          .map((i) => (
+                            <ListItem
+                              key={i.id}
+                              sx={{
+                                display: "flex",
+                                justifyContent: "space-between",
+                              }}
+                            >
+                              <Typography component='div'>{i.name} </Typography>
+                              <Typography variant='code'>
+                                USD {i.quote["USD"].price}
+                              </Typography>
+                            </ListItem>
+                          ))
+                      ) : (
+                        <Skeleton variant='rectangular' height={118} />
+                      )}
                       <Collapse in={open} timeout='auto' unmountOnExit>
-                        {trending.length &&
+                        {trending.length > 0 &&
                           trending.slice(3, 5).map((i) => (
-                            <ListItem key={i.id}>
+                            <ListItem
+                              key={i.id}
+                              sx={{
+                                display: "flex",
+                                justifyContent: "space-between",
+                                width: "100%",
+                              }}
+                            >
                               <Typography>{i.name}</Typography>
+                              <Typography variant='code'>
+                                {/* {USDPrice.shift((i) => i).toFixed(4)} */}
+                              </Typography>
                             </ListItem>
                           ))}
                       </Collapse>
-                      <IconButton onClick={handleOpen}>
-                        {open ? <ExpandLess /> : <ExpandMore />}
-                      </IconButton>
                     </List>
                   </CardContent>
+                  <CardActions>
+                    {trending.length > 0 ? (
+                      <Button onClick={handleOpen} size='small' color='primary'>
+                        {open ? <ExpandLess /> : <ExpandMore />}
+                      </Button>
+                    ) : (
+                      <Button
+                        disabled
+                        onClick={handleOpen}
+                        size='small'
+                        color='primary'
+                      >
+                        {open ? <ExpandLess /> : <ExpandMore />}
+                      </Button>
+                    )}
+                  </CardActions>
                 </Card>
               </Box>
             </Grid>
           </Grid>
           <br />
-          <Grid item lg={6} width={"100%"}>
-            <Box sx={{ height: 620, width: "100%" }}>
+          <Grid item lg={10} width={"100%"}>
+            <Box sx={{ height: 500, width: "100%" }}>
+              <Typography variant='h3' p={1} sx={{ textAlign: "center" }}>
+                Exchange Info
+              </Typography>
+
               <DataGrid
                 components={{
                   NoRowsOverlay: CustomNoRowsOverlay,
@@ -282,31 +327,53 @@ function Home() {
                     field: "name",
                     headerName: "Name",
                     width: 123,
+                    flex: 1,
                   },
                   {
-                    field: "maker_fee",
-                    headerName: "Maker Fee",
+                    field: "total_supply",
+                    headerName: "Total Supply",
                     width: 137,
+                    flex: 1,
                   },
                   {
-                    field: "spot_volume_usd",
-                    headerName: "Volume",
-                    width: 162,
+                    field: "circulating_supply",
+                    headerName: "Circulating Supply",
+                    width: 112,
+                    flex: 1,
                   },
-                  // {
-                  //   field: "slug",
-                  //   headerName: "Title",
-                  //   width: 123,
-                  //   renderCell: () => <div>Chart</div>,
-                  // },
+                  {
+                    field: "price",
+                    headerName: "Price(USD)",
+                    width: 123,
+                    flex: 1,
+                    valueGetter: (params) => {
+                      const price = params.row.quote["USD"].price;
+                      return Number(price).toFixed(5);
+                    },
+                  },
+                  {
+                    field: "market_cap",
+                    headerName: "Market Cap",
+                    valueGetter: (params) => {
+                      const marketCap = params.row.quote["USD"].market_cap;
+                      return Number(marketCap).toFixed(5);
+                    },
+                  },
                 ]}
               />
             </Box>
           </Grid>
         </Grid>
+        <br />
+        <br />
+        <br />
+
         <Grid container spacing={4}>
           <Grid item lg>
             <Box>
+              <Typography variant='h3' p={1} sx={{ textAlign: "center" }}>
+                BTC Dominance
+              </Typography>
               <HighchartsReact
                 ref={chart}
                 options={options}
