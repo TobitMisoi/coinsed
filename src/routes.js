@@ -1,19 +1,17 @@
 import React from "react";
 import { Navigate, Outlet } from "react-router-dom";
+import { HomeLayout, DashboardLayout } from "./layout";
+import { Dashboard, Home as HomePage } from "./views";
 
 const routes = [
   {
     path: "",
-    element: (
-      <>
-        Main layout <Outlet />
-      </>
-    ),
+    element: <HomeLayout />,
     children: [
       { path: "", element: <Navigate to={`/home`} replace /> },
       {
         path: "home",
-        element: <>Home</>,
+        element: <HomePage />,
       },
       {
         path: "about",
@@ -23,17 +21,12 @@ const routes = [
   },
   {
     path: "dashboard",
-    element: (
-      <>
-        Sidebar
-        <Outlet />
-      </>
-    ),
+    element: <DashboardLayout />,
     children: [
       { path: "", element: <Navigate to='/dashboard/account' replace /> },
       {
         path: "account",
-        element: <>Dashboard </>,
+        element: <Dashboard />,
       },
       { path: "transactions", element: <>Transaction</> },
     ],
