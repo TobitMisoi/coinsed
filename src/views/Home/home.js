@@ -83,6 +83,7 @@ function Home() {
     };
 
     fetchData();
+  // eslint-disable-next-line react-hooks/exhaustive-deps
   }, []);
 
   const [open, setOpen] = React.useState(false);
