@@ -1,7 +1,8 @@
 import React from "react";
-import { Navigate, Outlet } from "react-router-dom";
+import { Navigate } from "react-router-dom";
 import { HomeLayout, DashboardLayout } from "./layout";
-import { Dashboard, Home as HomePage } from "./views";
+import { Account } from "./pages";
+import { Home as HomePage } from "./views";
 
 const routes = [
   {
@@ -26,7 +27,7 @@ const routes = [
       { path: "", element: <Navigate to='/dashboard/account' replace /> },
       {
         path: "account",
-        element: <Dashboard />,
+        element: <Account />,
       },
       { path: "transactions", element: <>Transaction</> },
     ],
