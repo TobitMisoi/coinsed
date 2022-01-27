@@ -1,3 +1,4 @@
+import React from "react";
 import {
   Box,
   Card,
@@ -12,53 +13,54 @@ import {
   ListSubheader,
   CardActions,
   Skeleton,
+  CircularProgress,
 } from "@mui/material";
 import { DataGrid } from "@mui/x-data-grid";
-import React from "react";
 import CustomNoRowsOverlay from "./components/CustomNoRowsOverlay";
 
-import { useDemoData } from "@mui/x-data-grid-generator";
 import getData from "../../api/getData";
 import { ExpandLess, ExpandMore } from "@mui/icons-material";
+import HighchartsReact from "highcharts-react-official";
 import Highcharts from "highcharts";
 
 require("highcharts/modules/exporting")(Highcharts);
 require("highcharts/modules/export-data")(Highcharts);
 
 function Home() {
-  const { data } = useDemoData({
-    dataSet: "Commodity",
-    rowLength: 100,
-    maxColumns: 12,
-  });
-
-  // eslint-disable-next-line no-unused-vars
   const [payload, setPayload] = React.useState([]);
-  const [trending, setTrending] = React.useState([]);
+  const [topPicks, setTopPicks] = React.useState([]);
   const [pricePerformanceStats, setPricePerformanceStats] = React.useState([]);
 
+  const [loading, setLoading] = React.useState(false);
+
+  let labels = new Set();
   React.useEffect(() => {
     const fetchData = async () => {
-      let resp;
-      try {
-        resp = await getData(`/currencies`);
-        const trendingData = await getData(
-          `/v1/cryptocurrency/quotes/latest?id=1,1027,825,1839,3408,2010,52,5426,4172,74`
-        );
+      setLoading(true);
 
-        const pricePerformanceStats = await getData(
+      try {
+        // BTC dominance
+        const btcDominance = await getData(
           `/v1/cryptocurrency/listings/latest`
         );
 
+        // my top picks
+        const topPicks = await getData(
+          `/v1/cryptocurrency/quotes/latest?id=1,1027,825,1839,3408,2010,52,5426,4172,74`
+        );
+
+        // Listings
+        const pricePerformanceStats = await getData(
+          `/v1/cryptocurrency/listings/latest`
+        );
+        setLoading(false);
+
         setPricePerformanceStats(pricePerformanceStats.data["data"]);
-
-        setTrending(trendingData.data["data"]);
+        setTopPicks(topPicks.data["data"]);
+        setPayload(btcDominance.data["data"].map((i) => i.quote["BTC"].price));
       } catch (error) {
+        setLoading(false);
         console.log(error);
-      }
-
-      if (resp.data) {
-        setPayload(resp.data);
       }
     };
 
@@ -72,11 +74,95 @@ function Home() {
     setOpen(!open);
   };
 
-  const tr = [];
+  // chart configs
+  const chart = React.useRef(null);
+  const dataRows = [];
+  Object.values(pricePerformanceStats).map((i) => dataRows.push(i));
+  const options = {
+    chart: {
+      zoomType: "x",
+    },
+    title: {
+      text: null,
+    },
+    subtitle: {
+      text: null,
+    },
+    xAxis: {
+      categories: [...labels],
+      visible: false,
+    },
+    yAxis: {
+      title: {
+        text: "dominance",
+      },
+    },
+    legend: {
+      enabled: false,
+    },
+    credits: {
+      enabled: false,
+    },
+    plotOptions: {
+      area: {
+        fillColor: {
+          linearGradient: {
+            x1: 0,
+            y1: 0,
+            x2: 0,
+            y2: 1,
+          },
+          stops: [
+            [0, Highcharts.getOptions().colors[0]],
+            [
+              1,
+              Highcharts.color(Highcharts.getOptions().colors[10])
+                .setOpacity(0)
+                .get("rgba"),
+            ],
+          ],
+        },
+        marker: {
+          radius: 2,
+        },
+        lineWidth: 1,
+        states: {
+          hover: {
+            lineWidth: 1,
+          },
+        },
+        threshold: null,
+      },
+    },
+    tooltip: {
+      enabled: false,
+    },
+    series: [
+      {
+        type: "area",
+        name: "USD to EUR",
+        data: payload,
+      },
+    ],
+  };
 
-  Object.values(pricePerformanceStats).map((i) => tr.push(i));
-
-  // const chart = React.useRef(null);
+  if (loading) {
+    return (
+      <Box
+        sx={{
+          height: 300,
+          width: "100%",
+          mt: "78px",
+          display: "flex",
+          alignItems: "center",
+          justifyContent: "center",
+        }}
+      >
+        <Typography variant='p'>Loading please wait...</Typography>
+        <CircularProgress color='secondary' />
+      </Box>
+    );
+  }
 
   return (
     <>
@@ -95,29 +181,6 @@ function Home() {
         >
           <br />
           <Grid container spacing={1}>
-            {/* <Grid item xs={12} md={6}>
-              <Box
-                pt={4}
-                sx={{
-                  margin: "0 auto",
-                }}
-                alignItems='center'
-                maxWidth={310}
-                p={1}
-              >
-                <Typography variant='code'>0% commision</Typography>
-                <Typography variant='h2' maxWidth={310} p={1}>
-                  Join the best Crypto currency exchange
-                </Typography>
-                <Typography mb={5}>
-                  Start trading with over 740 different cryptocurrency and fiat
-                  currency pairs, including Bitcoin, Ethereum and BNB pairs
-                </Typography>
-                <Button sx={{ background: "#94FBAB", color: "#000100" }}>
-                  Start Trading
-                </Button>
-              </Box>
-            </Grid> */}
             <Grid
               sx={{ position: "relative" }}
               display='flex'
@@ -153,16 +216,16 @@ function Home() {
                       subheader={
                         <ListSubheader
                           component='div'
-                          aria-labelledby='trending-sub-header'
-                          id='trending-sub-header'
+                          aria-labelledby='topPicks-sub-header'
+                          id='topPicks-sub-header'
                           sx={{ fontWeight: "bold" }}
                         >
                           Top picks
                         </ListSubheader>
                       }
                     >
-                      {Object.values(trending).length > 0 ? (
-                        Object.values(trending)
+                      {Object.values(topPicks).length > 0 ? (
+                        Object.values(topPicks)
                           .slice(0, 3)
                           .map((i) => (
                             <ListItem
@@ -182,8 +245,8 @@ function Home() {
                         <Skeleton variant='rectangular' height={118} />
                       )}
                       <Collapse in={open} timeout='auto' unmountOnExit>
-                        {trending.length > 0 &&
-                          trending.slice(3, 5).map((i) => (
+                        {topPicks.length > 0 &&
+                          topPicks.slice(3, 5).map((i) => (
                             <ListItem
                               key={i.id}
                               sx={{
@@ -202,7 +265,7 @@ function Home() {
                     </List>
                   </CardContent>
                   <CardActions>
-                    {trending.length > 0 ? (
+                    {topPicks.length > 0 ? (
                       <Button onClick={handleOpen} size='small' color='primary'>
                         {open ? <ExpandLess /> : <ExpandMore />}
                       </Button>
@@ -222,8 +285,8 @@ function Home() {
             </Grid>
           </Grid>
           <br />
-          <Grid item lg={12} width={"100%"}>
-            <Box sx={{ height: 526, width: "100%" }}>
+          <Grid item lg={10} width={"100%"}>
+            <Box sx={{ height: 500, width: "100%" }}>
               <Typography variant='h3' p={1} sx={{ textAlign: "center" }}>
                 Exchange Info
               </Typography>
@@ -232,9 +295,9 @@ function Home() {
                 components={{
                   NoRowsOverlay: CustomNoRowsOverlay,
                 }}
-                rows={tr}
+                rows={dataRows}
                 disableSelectionOnClick
-                loading={data.rows.length === 0}
+                loading={loading}
                 pageSize={9}
                 rowsPerPageOptions={[9]}
                 columns={[
@@ -283,7 +346,7 @@ function Home() {
         <br />
         <br />
 
-        {/* <Grid container spacing={4}>
+        <Grid container spacing={4}>
           <Grid item lg>
             <Box>
               <Typography variant='h3' p={1} sx={{ textAlign: "center" }}>
@@ -296,7 +359,7 @@ function Home() {
               />
             </Box>
           </Grid>
-        </Grid> */}
+        </Grid>
       </Box>
     </>
   );
