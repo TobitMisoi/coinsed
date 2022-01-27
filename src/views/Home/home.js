@@ -2,59 +2,80 @@ import {
   Box,
   Card,
   CardContent,
-  CardHeader,
   Grid,
   List,
   ListItem,
-  ListItemText,
+  Divider,
   Typography,
+  Collapse,
+  Button,
+  IconButton,
+  ListSubheader,
 } from "@mui/material";
 import { DataGrid } from "@mui/x-data-grid";
 import React from "react";
 import CustomNoRowsOverlay from "./components/CustomNoRowsOverlay";
 
 import { useDemoData } from "@mui/x-data-grid-generator";
-import axios from "axios";
+import getData from "../../api/getData";
+import { ExpandLess, ExpandMore } from "@mui/icons-material";
 
 function Home() {
   const { data } = useDemoData({
     dataSet: "Commodity",
     rowLength: 100,
-    maxColumns: 8,
+    maxColumns: 12,
   });
 
   const [payload, setPayload] = React.useState([]);
+  const [trending, setTrending] = React.useState([]);
+  const [pricePerformanceStats, setPricePerformanceStats] = React.useState([]);
 
   React.useEffect(() => {
     const fetchData = async () => {
       let resp;
       try {
-        resp = await axios.get(
-          `https://sandbox-api.coinmarketcap.com/v1/cryptocurrency/listings/historical?date=${new Date()}`,
-          {
-            headers: {
-              "X-CMC_PRO_API_KEY": "b54bcf4d-1bca-4e8e-9a24-22ff2c3d462c",
-            },
-          }
+        resp = await getData(`/currencies`);
+        const trendingData = await getData(
+          `/v1/cryptocurrency/trending/latest?limit=20`
         );
 
-        // setPayload(resp.data);
+        const pricePerformanceStatsId = trendingData.data["data"].data.map(
+          (i) => i.id
+        );
+
+        const pricePerformanceStats = await getData(
+          `/v1/exchange/info?id=${pricePerformanceStatsId}`
+        );
+
+        setPricePerformanceStats(pricePerformanceStats.data["data"]);
+
+        setTrending(trendingData.data["data"].data);
       } catch (error) {
         console.log(error);
       }
 
       if (resp.data) {
-        setPayload(resp.data["data"]);
+        setPayload(resp.data);
       }
     };
 
     fetchData();
   }, []);
 
+  const [open, setOpen] = React.useState(false);
+
+  const handleOpen = () => {
+    setOpen(!open);
+  };
+
+  const tr = [];
+
+  Object.values(pricePerformanceStats).map((i) => tr.push(i));
 
   return (
     <>
-      <Box sx={{ border: "1px solid" }}>
+      <Box sx={{ mt: "78px" }}>
         <Grid
           container
           spacing={2}
@@ -65,66 +86,164 @@ function Home() {
             justifyContent: "center",
             // width: "100%",
             alignItems: "center",
-            border: "1px solid",
           }}
         >
-          <Grid item lg={9}>
-            <Typography variant='h3'>
-              Today's Cryptocurrency Prices by Market cap
-            </Typography>
-            <Typography variant='body1'>
-              The global crypto market cap is $1.71T, a 1.13% increase over the
-              last 7 days
-            </Typography>
-          </Grid>
-          <Grid item lg={6} sx={{ width: "100%" }}>
-            <Card elevation={3} sx={{ width: "100%" }}>
-              <CardHeader title='Trending' />
-              <CardContent>
-                <List>
-                  <ListItem>
-                    <ListItemText primary='BTC' />
-                  </ListItem>
-                </List>
-              </CardContent>
-            </Card>
+          <br />
+          <Grid container spacing={1}>
+            <Grid item xs={12} md={6}>
+              <Box
+                pt={4}
+                sx={{
+                  margin: "0 auto",
+                }}
+                alignItems='center'
+                maxWidth={310}
+                p={1}
+              >
+                <Typography variant='code'>0% commision</Typography>
+                <Typography variant='h2' maxWidth={310} p={1}>
+                  Join the best Crypto currency exchange
+                </Typography>
+                <Typography mb={5}>
+                  Start trading with over 740 different cryptocurrency and fiat
+                  currency pairs, including Bitcoin, Ethereum and BNB pairs
+                </Typography>
+                <Button sx={{ background: "#94FBAB", color: "#000100" }}>
+                  Start Trading
+                </Button>
+              </Box>
+            </Grid>
+            <Grid
+              sx={{ position: "relative" }}
+              display='flex'
+              alignItems='center'
+              item
+              xs={12}
+              md={6}
+            >
+              {/* <Hidden mdDown> */}
+              <Divider orientation='vertical' />
+              {/* </Hidden> */}
+              <Box m={2} pt={4} sx={{ width: "100%" }}>
+                <Card
+                  elevation={2}
+                  sx={{
+                    width: "100%",
+                    margin: "0 auto",
+                  }}
+                >
+                  <CardContent>
+                    <List
+                      sx={{
+                        width: "100%",
+                        maxWidth: 360,
+                      }}
+                      subheader={
+                        <ListSubheader
+                          component='div'
+                          aria-labelledby='trending-sub-header'
+                          id='trending-sub-header'
+                        >
+                          Trending
+                        </ListSubheader>
+                      }
+                    >
+                      {trending.length &&
+                        trending.slice(0, 3).map((i) => (
+                          <ListItem key={i.id}>
+                            <Typography>{i.name}</Typography>
+                            <Typography variant='code'>{i.cmc_rank}</Typography>
+                          </ListItem>
+                        ))}
+                      <Collapse in={open} timeout='auto' unmountOnExit>
+                        {trending.length &&
+                          trending.slice(3, 5).map((i) => (
+                            <ListItem key={i.id}>
+                              <Typography>{i.name}</Typography>
+                            </ListItem>
+                          ))}
+                      </Collapse>
+                      <IconButton onClick={handleOpen}>
+                        {open ? <ExpandLess /> : <ExpandMore />}
+                      </IconButton>
+                    </List>
+                  </CardContent>
+                </Card>
+                {/* <Card sx={{ ml: 2 }}>
+                  <CardContent sx={{ margin: "0 auto" }}>
+                    <List
+                      sx={{
+                        width: "100%",
+                        maxWidth: 360,
+                      }}
+                      subheader={
+                        <ListSubheader
+                          component='div'
+                          aria-labelledby='trending-sub-header'
+                          id='trending-sub-header'
+                        >
+                          Trending
+                        </ListSubheader>
+                      }
+                    >
+                      {trending.length &&
+                        trending.slice(0, 3).map((i) => (
+                          <ListItem key={i.id}>
+                            <Typography>{i.name}</Typography>
+                            <Typography variant='code'>{i.cmc_rank}</Typography>
+                          </ListItem>
+                        ))}
+                      <Collapse in={open} timeout='auto' unmountOnExit>
+                        {trending.length &&
+                          trending.slice(3, 5).map((i) => (
+                            <ListItem key={i.id}>
+                              <Typography>{i.name}</Typography>
+                            </ListItem>
+                          ))}
+                      </Collapse>
+                      <IconButton onClick={handleOpen}>
+                        {open ? <ExpandLess /> : <ExpandMore />}
+                      </IconButton>
+                    </List>
+                  </CardContent>
+                </Card> */}
+              </Box>
+            </Grid>
           </Grid>
           <br />
           <Grid item lg={6} width={"100%"}>
-            <Box sx={{ height: 400, width: "100%" }}>
+            <Box sx={{ height: 620, width: "100%" }}>
               <DataGrid
                 components={{
                   NoRowsOverlay: CustomNoRowsOverlay,
                 }}
-                // {...data}
-                rows={payload}
+                rows={tr}
+                disableSelectionOnClick
+                loading={data.rows.length === 0}
+                pageSize={9}
+                rowsPerPageOptions={[4]}
                 columns={[
-                  { field: "id", field: "name", headerName: "Name" },
                   {
-                    field: "num_market_pairs",
-                    headerName: "Market pairs",
-                    width: 117,
-                  },
-                  {
-                    field: "circulating_supply",
-                    headerName: "Circulating Supply",
-                    width: 130,
-                  },
-                  {
-                    field: "total_supply",
-                    headerName: "Total Supply",
+                    field: "name",
+                    headerName: "Name",
                     width: 123,
                   },
                   {
-                    field: "max_supply",
-                    headerName: "Max Supply",
-                    width: 123,
+                    field: "maker_fee",
+                    headerName: "Maker Fee",
+                    width: 137,
                   },
                   {
-                    field: "last_updated",
-                    width: 124,
-                    headerName: "Updated",
+                    field: "spot_volume_usd",
+                    headerName: "Volume",
+                    width: 162,
                   },
+                  // {
+                  //   field: "slug",
+                  //   headerName: "Title",
+                  //   width: 123,
+                  //   renderCell: () => <div>Chart</div>,
+                  // },
                 ]}
               />
             </Box>
