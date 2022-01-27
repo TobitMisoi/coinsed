@@ -7,7 +7,7 @@ function Header() {
     let resp;
     try {
       resp = await axios.get(
-        "https://www.coinbase.com/oauth/authorize?response_type=code&client_id=149490c36f2f507b895940dca79643e5c6e98325f805e14ddadee0c02d1ad57a&redirect_uri=http://localhost:3000&state=SECURE_RANDOM&scope=wallet:accounts:read"
+        `https://www.coinbase.com/oauth/authorize?response_type=code&client_id=${process.env.REACT_APP_CLIENT_ID}&redirect_uri=${process.env.REACT_APP_REDIRECT_URL}&state=SECURE_RANDOM&scope=wallet:accounts:read`
       );
     } catch (error) {
       console.log(error);
