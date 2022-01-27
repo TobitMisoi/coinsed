@@ -22,6 +22,9 @@ import { ExpandLess, ExpandMore } from "@mui/icons-material";
 import HighchartsReact from "highcharts-react-official";
 import Highcharts from "highcharts";
 
+require("highcharts/modules/exporting")(Highcharts);
+require("highcharts/modules/export-data")(Highcharts);
+
 function Home() {
   const { data } = useDemoData({
     dataSet: "Commodity",
@@ -35,9 +38,8 @@ function Home() {
   const [pricePerformanceStats, setPricePerformanceStats] = React.useState([]);
   const [gMetricsData, setGMetricsData] = React.useState([]);
 
-  let gMetrics = React.memo([]);
+  let gMetrics = [];
   let labels = new Set();
-  console.log(labels);
   React.useEffect(() => {
     const fetchData = async () => {
       let resp;
@@ -81,7 +83,7 @@ function Home() {
     };
 
     fetchData();
-  }, [gMetrics]);
+  }, []);
 
   const [open, setOpen] = React.useState(false);
 
@@ -273,7 +275,7 @@ function Home() {
                 disableSelectionOnClick
                 loading={data.rows.length === 0}
                 pageSize={9}
-                rowsPerPageOptions={[4]}
+                rowsPerPageOptions={[9]}
                 columns={[
                   {
                     field: "name",
