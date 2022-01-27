@@ -4,6 +4,11 @@ import { BrowserRouter } from "react-router-dom";
 import App from "./App";
 import reportWebVitals from "./reportWebVitals";
 
+// styles
+import "./assets/styles/index.css";
+import "@emotion/react";
+import "@emotion/styled";
+
 ReactDOM.render(
   <React.StrictMode>
     <BrowserRouter>
