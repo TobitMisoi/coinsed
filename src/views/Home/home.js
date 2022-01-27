@@ -19,6 +19,8 @@ import CustomNoRowsOverlay from "./components/CustomNoRowsOverlay";
 import { useDemoData } from "@mui/x-data-grid-generator";
 import getData from "../../api/getData";
 import { ExpandLess, ExpandMore } from "@mui/icons-material";
+import HighchartsReact from "highcharts-react-official";
+import Highcharts from "highcharts";
 
 function Home() {
   const { data } = useDemoData({
@@ -27,10 +29,15 @@ function Home() {
     maxColumns: 12,
   });
 
+  // eslint-disable-next-line no-unused-vars
   const [payload, setPayload] = React.useState([]);
   const [trending, setTrending] = React.useState([]);
   const [pricePerformanceStats, setPricePerformanceStats] = React.useState([]);
+  const [gMetricsData, setGMetricsData] = React.useState([]);
 
+  let gMetrics = React.memo([]);
+  let labels = new Set();
+  console.log(labels);
   React.useEffect(() => {
     const fetchData = async () => {
       let resp;
@@ -48,6 +55,19 @@ function Home() {
           `/v1/exchange/info?id=${pricePerformanceStatsId}`
         );
 
+        var tsYesterday = new Date(Date.now() - 86400 * 1000).toISOString();
+
+        const globalMetricsData = await getData(
+          `/v1/global-metrics/quotes/historical?time_start=${tsYesterday}&interval=30m`
+        );
+
+        globalMetricsData.data["data"].quotes.map((i) => {
+          gMetrics.push(i.btc_dominance);
+          return { gMetrics };
+        });
+
+        setGMetricsData(gMetrics);
+
         setPricePerformanceStats(pricePerformanceStats.data["data"]);
 
         setTrending(trendingData.data["data"].data);
@@ -61,7 +81,7 @@ function Home() {
     };
 
     fetchData();
-  }, []);
+  }, [gMetrics]);
 
   const [open, setOpen] = React.useState(false);
 
@@ -71,7 +91,77 @@ function Home() {
 
   const tr = [];
 
+  const options = {
+    chart: {
+      zoomType: "x",
+    },
+    title: {
+      text: null,
+    },
+    subtitle: {
+      text: null,
+    },
+    xAxis: {
+      categories: [...labels],
+      visible: false,
+    },
+    yAxis: {
+      title: {
+        text: "dominance",
+      },
+    },
+    legend: {
+      enabled: false,
+    },
+    credits: {
+      enabled: false,
+    },
+    plotOptions: {
+      area: {
+        fillColor: {
+          linearGradient: {
+            x1: 0,
+            y1: 0,
+            x2: 0,
+            y2: 1,
+          },
+          stops: [
+            [0, Highcharts.getOptions().colors[0]],
+            [
+              1,
+              Highcharts.color(Highcharts.getOptions().colors[10])
+                .setOpacity(0)
+                .get("rgba"),
+            ],
+          ],
+        },
+        marker: {
+          radius: 2,
+        },
+        lineWidth: 1,
+        states: {
+          hover: {
+            lineWidth: 1,
+          },
+        },
+        threshold: null,
+      },
+    },
+    tooltip: {
+      enabled: false,
+    },
+    series: [
+      {
+        type: "area",
+        name: "USD to EUR",
+        data: gMetricsData,
+      },
+    ],
+  };
+
   Object.values(pricePerformanceStats).map((i) => tr.push(i));
+
+  const chart = React.useRef(null);
 
   return (
     <>
@@ -84,7 +174,7 @@ function Home() {
             display: "flex",
             flexDirection: "column",
             justifyContent: "center",
-            // width: "100%",
+            width: "100%",
             alignItems: "center",
           }}
         >
@@ -169,44 +259,6 @@ function Home() {
                     </List>
                   </CardContent>
                 </Card>
-                {/* <Card sx={{ ml: 2 }}>
-                  <CardContent sx={{ margin: "0 auto" }}>
-                    <List
-                      sx={{
-                        width: "100%",
-                        maxWidth: 360,
-                      }}
-                      subheader={
-                        <ListSubheader
-                          component='div'
-                          aria-labelledby='trending-sub-header'
-                          id='trending-sub-header'
-                        >
-                          Trending
-                        </ListSubheader>
-                      }
-                    >
-                      {trending.length &&
-                        trending.slice(0, 3).map((i) => (
-                          <ListItem key={i.id}>
-                            <Typography>{i.name}</Typography>
-                            <Typography variant='code'>{i.cmc_rank}</Typography>
-                          </ListItem>
-                        ))}
-                      <Collapse in={open} timeout='auto' unmountOnExit>
-                        {trending.length &&
-                          trending.slice(3, 5).map((i) => (
-                            <ListItem key={i.id}>
-                              <Typography>{i.name}</Typography>
-                            </ListItem>
-                          ))}
-                      </Collapse>
-                      <IconButton onClick={handleOpen}>
-                        {open ? <ExpandLess /> : <ExpandMore />}
-                      </IconButton>
-                    </List>
-                  </CardContent>
-                </Card> */}
               </Box>
             </Grid>
           </Grid>
@@ -245,6 +297,17 @@ function Home() {
                   //   renderCell: () => <div>Chart</div>,
                   // },
                 ]}
+              />
+            </Box>
+          </Grid>
+        </Grid>
+        <Grid container spacing={4}>
+          <Grid item lg>
+            <Box>
+              <HighchartsReact
+                ref={chart}
+                options={options}
+                highcharts={Highcharts}
               />
             </Box>
           </Grid>
