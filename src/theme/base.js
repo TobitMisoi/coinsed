@@ -10,6 +10,9 @@ const theme = createTheme({
     secondary: {
       main: blue[300],
     },
+    common: {
+      black: "#000100",
+    },
   },
   typography: {
     fontFamily: "Roboto",
