@@ -4,13 +4,16 @@ import React from "react";
 function Footer() {
   return (
     <footer>
-      <AppBar position='fixed' sx={{ bottom: 0, top: "auto" }}>
+      <AppBar position='relative' sx={{ bottom: 0, background: "#000100" }}>
         <Box sx={{ display: "flex", justifyContent: "space-between" }}>
           <Toolbar>Footer Section</Toolbar>
           <Toolbar>short links</Toolbar>
         </Box>
-        <Typography sx={{ textAlign: "center" }}>
-          Made with ❤️ by <a href='https://tobitmisoi.com'>tobitmisoi</a>
+        <Typography sx={{ textAlign: "center", color: "#f8f8f8" }}>
+          Made with ❤️ by{" "}
+          <a style={{ color: "#f8f8f8" }} href='https://tobitmisoi.com'>
+            tobitmisoi
+          </a>
         </Typography>
       </AppBar>
     </footer>
