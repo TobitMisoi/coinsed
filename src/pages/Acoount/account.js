@@ -1,3 +1,4 @@
+import { useAuth0 } from "@auth0/auth0-react";
 import { TrendingUp } from "@mui/icons-material";
 import {
   Avatar,
@@ -8,6 +9,7 @@ import {
   styled,
   Typography,
 } from "@mui/material";
+import { useTheme } from "@mui/styles";
 import React from "react";
 import data from "./dummyData";
 
@@ -20,17 +22,39 @@ const AvatarSuccess = styled(Avatar)(
     `
 );
 
-function account() {
+function Account() {
+  const { user } = useAuth0();
+
+  const theme = useTheme();
+
   return (
-    <Box>
-      <Card elevation={5} sx={{ width: "100%", m: 2 }}>
+    <Box sx={{ width: "100%", mt: 3 }}>
+      <Grid container sx={{ p: 1 }} alignItems='center'>
+        <Grid item>
+          <Avatar
+            sx={{ mr: 2, width: theme.spacing(8), height: theme.spacing(8) }}
+            variant='rounded'
+            alt={user.name}
+            src={user.picture}
+          />
+        </Grid>
+        <Grid item>
+          <Typography variant='h3' component='h3' gutterBottom>
+            Welcome, {user.name}!
+          </Typography>
+          <Typography variant='subtitle2'>
+            Today is a good day to start trading crypto assets!
+          </Typography>
+        </Grid>
+      </Grid>
+      <Card elevation={5} sx={{ m: 2 }}>
         <Grid spacing={0} container>
           <Grid item xs={12} md={12}>
             <Box p={4}>
               <Typography sx={{ pb: 3 }} variant='h4'>
                 Account Balances
               </Typography>
-              <Box sx={{}}>
+              <Box>
                 <Typography variant='h3' gutterBottom>
                   {data.map((i) => i.balance)}
                 </Typography>
@@ -83,4 +107,4 @@ function account() {
   );
 }
 
-export default account;
+export default Account;
