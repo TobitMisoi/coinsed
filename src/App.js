@@ -1,3 +1,4 @@
+import { ThirdwebWeb3Provider } from "@3rdweb/hooks";
 import { CssBaseline } from "@mui/material";
 import React from "react";
 import { useRoutes } from "react-router-dom";
@@ -6,23 +7,31 @@ import routes from "./routes";
 function App() {
   const content = useRoutes(routes);
 
-  function getParameterByName(name, url = window.location.href) {
-    name = name.replace(/[\\[\]]/g, "\\$&");
-    var regex = new RegExp("[?&]" + name + "(=([^&#]*)|&|#|$)"),
-      results = regex.exec(url);
-    if (!results) return null;
-    if (!results[2]) return "";
-    return decodeURIComponent(results[2].replace(/\+/g, " "));
-  }
-
-  getParameterByName("id");
-
-  console.log(getParameterByName("code"));
+  // thirweb inititiators
+  const supportedChainIds = [1, 4, 137, 80001];
+  const connectors = {
+    injected: {},
+    magic: {
+      // apiKey: "pk_...", // Your magic api key
+      // chainId: 1, // The chain ID you want to allow on magic
+    },
+    walletconnect: {},
+    walletlink: {
+      appName: "coinsed",
+      url: "https://coinsed.vercel.app",
+      darkMode: false,
+    },
+  };
 
   return (
     <>
-      <CssBaseline />
-      {content}
+      <ThirdwebWeb3Provider
+        connectors={connectors}
+        supportedChainIds={supportedChainIds}
+      >
+        <CssBaseline />
+        {content}
+      </ThirdwebWeb3Provider>
     </>
   );
 }

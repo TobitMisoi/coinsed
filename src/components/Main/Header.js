@@ -1,21 +1,20 @@
 import { AppBar, Box, Button, Toolbar, Typography } from "@mui/material";
 import React from "react";
-import axios from "axios";
+import { useAuth0 } from "@auth0/auth0-react";
+import { useNavigate } from "react-router-dom";
+import { createBrowserHistory } from "history";
 
-function Header() {
-  const accessCoinbase = async () => {
-    let resp;
-    try {
-      resp = await axios.get(
-        `https://www.coinbase.com/oauth/authorize?response_type=code&client_id=${process.env.REACT_APP_CLIENT_ID}&redirect_uri=${process.env.REACT_APP_REDIRECT_URL}&state=SECURE_RANDOM&scope=wallet:accounts:read`
-      );
-    } catch (error) {
-      console.log(error);
-    }
+function Header(props) {
+  const { loginWithPopup, isAuthenticated } = useAuth0();
+  const navigate = useNavigate();
 
-    if (resp.config.url) {
-      window.location.href = resp.config.url;
+  const history = createBrowserHistory();
+  const handleLogin = () => {
+    loginWithPopup();
+    if (isAuthenticated) {
+      navigate("/dashboard");
     }
+    history.push("/dashboard");
   };
 
   return (
@@ -37,7 +36,7 @@ function Header() {
                 variant='contained'
                 color='primary'
                 disableRipple
-                onClick={accessCoinbase}
+                onClick={handleLogin}
               >
                 LOGIN
               </Button>

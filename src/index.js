@@ -9,13 +9,20 @@ import "@emotion/react";
 import "@emotion/styled";
 import theme from "./theme/base";
 import { ThemeProvider } from "@mui/material/styles";
+import { Auth0Provider } from "@auth0/auth0-react";
 
 ReactDOM.render(
   <React.StrictMode>
     <ThemeProvider theme={theme}>
-      <BrowserRouter>
-        <App />
-      </BrowserRouter>
+      <Auth0Provider
+        domain={process.env.REACT_APP_AUTH0_DOMAIN}
+        clientId={process.env.REACT_APP_AUTH0_CLIENT_ID}
+        redirectUri={process.env.REACT_APP_AUTH0_CLIENT_REDIRECT_URL}
+      >
+        <BrowserRouter>
+          <App />
+        </BrowserRouter>
+      </Auth0Provider>
     </ThemeProvider>
   </React.StrictMode>,
   document.getElementById("root")

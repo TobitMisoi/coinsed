@@ -2,6 +2,7 @@ import React from "react";
 import { Navigate } from "react-router-dom";
 import { HomeLayout, DashboardLayout } from "./layout";
 import { Account } from "./pages";
+import PrivateRoute from "./routes/PrivateRoute";
 import { Home as HomePage } from "./views";
 
 const routes = [
@@ -22,7 +23,13 @@ const routes = [
   },
   {
     path: "dashboard",
-    element: <DashboardLayout />,
+    element: (
+      <>
+        <PrivateRoute>
+          <DashboardLayout />
+        </PrivateRoute>
+      </>
+    ),
     children: [
       { path: "", element: <Navigate to='/dashboard/account' replace /> },
       {
