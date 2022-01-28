@@ -30,6 +30,7 @@ In the project directory, you can run:
 
 ### `npm install`
 
+if node version error persists try: `yarn install --ignore-engines`
 
 ### `npm start`
 
