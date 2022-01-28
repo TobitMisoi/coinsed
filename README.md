@@ -7,9 +7,13 @@ Disclaimer:
 - The web app is limited and restricted to certain scopes since most of the fetures and resources are just but test environment-specific.
 
 
-This project was bootstrapped with [Create React App](https://github.com/facebook/create-react-app).
+[Coinsed](https://coinsed.vercel.app)
 
 ## Available Scripts
+
+Before running your development app, consider;
+ Adding your required environment variables for the frontend and backend directories:
+   - `touch .env` from the /src folder
 
 In the project directory, you can run:
 
