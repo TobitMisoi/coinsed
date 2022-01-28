@@ -13,7 +13,7 @@ import { Link } from "react-router-dom";
 import { useAuth0 } from "@auth0/auth0-react";
 import { useWeb3 } from "@3rdweb/hooks";
 
-const drawerWidth = 240;
+const drawerWidth = 190;
 
 function Sidebar() {
   const { logout } = useAuth0();
@@ -41,7 +41,17 @@ function Sidebar() {
         anchor='left'
       >
         <Toolbar sx={{ display: "flex", alignItems: "center", width: "100%" }}>
-          <Typography component={Link} to='/home'>
+          <Typography
+            component={Link}
+            to='/home'
+            variant='h4'
+            sx={{
+              textDecoration: "none",
+              color: "fuchsia",
+              textTransform: "uppercase",
+              pt: 3,
+            }}
+          >
             Coinsed
           </Typography>
         </Toolbar>

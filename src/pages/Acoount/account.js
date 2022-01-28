@@ -22,7 +22,7 @@ function Account() {
 
   return (
     <>
-      <Box sx={{ width: "100%", mt: 3 }}>
+      <Box sx={{ width: "60%", margin: "0 auto", mt: 3 }}>
         <Grid container sx={{ p: 1 }} alignItems='center'>
           <Grid item>
             <Avatar
