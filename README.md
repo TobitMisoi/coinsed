@@ -14,6 +14,17 @@ Disclaimer:
 Before running your development app, consider;
  Adding your required environment variables for the frontend and backend directories:
    - `touch .env` from the /src folder
+   
+   ```
+   REACT_APP_API_KEY: COINMARKETCAP_API_KEY
+REACT_APP_CLIENT_ID: COINMARKET_CLIENT_ID
+REACT_APP_REDIRECT_URL: COINMARKETCAP_REDIRECT_URL(http://localhost:3000/dashboard)
+
+REACT_APP_AUTH0_DOMAIN: AUTH0_DOMAIN
+REACT_APP_AUTH0_CLIENT_ID: AUTH0_CLIENT_ID
+REACT_APP_AUTH0_CLIENT_REDIRECT_URL: AUTH0_REDIRECT_URL(https://localhost:3000/dashboard)
+   
+   ```
 
 In the project directory, you can run:
 
