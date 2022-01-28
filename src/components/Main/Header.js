@@ -8,6 +8,8 @@ function Header(props) {
   const { loginWithPopup, isAuthenticated } = useAuth0();
   const navigate = useNavigate();
 
+  console.log(props);
+
   const history = createBrowserHistory();
   const handleLogin = () => {
     loginWithPopup();
@@ -38,7 +40,7 @@ function Header(props) {
                 disableRipple
                 onClick={handleLogin}
               >
-                LOGIN
+                {isAuthenticated ? "GO TO DASHBOARD" : "LOGIN"}
               </Button>
             </Toolbar>
           </Box>
