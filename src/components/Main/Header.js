@@ -2,15 +2,19 @@ import { AppBar, Box, Button, Toolbar, Typography } from "@mui/material";
 import React from "react";
 import { useAuth0 } from "@auth0/auth0-react";
 import { useNavigate } from "react-router-dom";
+import { createBrowserHistory } from "history";
 
-function Header() {
+function Header(props) {
   const { loginWithPopup, isAuthenticated } = useAuth0();
   const navigate = useNavigate();
+
+  const history = createBrowserHistory();
   const handleLogin = () => {
     loginWithPopup();
     if (isAuthenticated) {
       navigate("/dashboard");
     }
+    history.push("/dashboard");
   };
 
   return (

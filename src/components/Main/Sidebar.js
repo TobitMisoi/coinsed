@@ -10,10 +10,21 @@ import {
 } from "@mui/material";
 import React from "react";
 import { Link } from "react-router-dom";
+import { useAuth0 } from "@auth0/auth0-react";
+import { useWeb3 } from "@3rdweb/hooks";
 
 const drawerWidth = 240;
 
 function Sidebar() {
+  const { logout } = useAuth0();
+  const { disconnectWallet } = useWeb3();
+
+  const handleLogout = () => {
+    logout();
+    disconnectWallet();
+    return;
+  };
+
   return (
     <div>
       <Drawer
@@ -36,10 +47,7 @@ function Sidebar() {
         </Toolbar>
         <Divider />
         <List>
-          {[
-            { name: "Overview", path: "account" },
-            { name: "Transactions", path: "transactions" },
-          ].map((text, index) => (
+          {[{ name: "Overview", path: "account" }].map((text, index) => (
             <ListItem button key={index} component={Link} to={text.path}>
               <ListItemText primary={text.name} />
             </ListItem>
@@ -47,19 +55,14 @@ function Sidebar() {
         </List>
         <Divider />
         <Button
-          color='secondary'
-          size='small'
+          variant='outlined'
           sx={{
-            background: "#6c74cc",
-            borderRadius: 3,
-            border: 0,
-            color: "white",
-            height: 48,
-            padding: "0 30px",
-            width: 200,
-            // width: "fit-content`",
+            position: "fixed",
+            bottom: 20,
+            left: "10px",
+            background: "red",
           }}
-          onClick={() => console.log("Logout")}
+          onClick={handleLogout}
         >
           Logout
         </Button>

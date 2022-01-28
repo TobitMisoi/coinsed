@@ -13,7 +13,6 @@ import {
   ListSubheader,
   CardActions,
   Skeleton,
-  CircularProgress,
 } from "@mui/material";
 import { DataGrid } from "@mui/x-data-grid";
 import CustomNoRowsOverlay from "./components/CustomNoRowsOverlay";
@@ -57,7 +56,11 @@ function Home() {
 
         setPricePerformanceStats(pricePerformanceStats.data["data"]);
         setTopPicks(topPicks.data["data"]);
-        setPayload(btcDominance.data["data"].map((i) => i.quote["BTC"].price));
+        setPayload(
+          btcDominance.data["data"].map(
+            (i) => i.quote["USD"].market_cap_dominance
+          )
+        );
       } catch (error) {
         setLoading(false);
         console.log(error);
@@ -135,33 +138,21 @@ function Home() {
       },
     },
     tooltip: {
-      enabled: false,
+      headerFormat: null,
     },
     series: [
       {
         type: "area",
-        name: "USD to EUR",
+        name: "Market Cap dominance",
         data: payload,
       },
     ],
   };
 
+  let skeleton;
+
   if (loading) {
-    return (
-      <Box
-        sx={{
-          height: 300,
-          width: "100%",
-          mt: "78px",
-          display: "flex",
-          alignItems: "center",
-          justifyContent: "center",
-        }}
-      >
-        <Typography variant='p'>Loading please wait...</Typography>
-        <CircularProgress color='secondary' />
-      </Box>
-    );
+    skeleton = <Skeleton variant='rectangular' height={118} />;
   }
 
   return (
@@ -218,9 +209,9 @@ function Home() {
                           component='div'
                           aria-labelledby='topPicks-sub-header'
                           id='topPicks-sub-header'
-                          sx={{ fontWeight: "bold" }}
+                          sx={{ fontWeight: "bold", fontSize: "18px" }}
                         >
-                          Top picks
+                          Top Picks
                         </ListSubheader>
                       }
                     >
@@ -237,35 +228,37 @@ function Home() {
                             >
                               <Typography component='div'>{i.name} </Typography>
                               <Typography variant='code'>
-                                USD {i.quote["USD"].price}
+                                USD <strong>{i.quote["USD"].price}</strong>
                               </Typography>
                             </ListItem>
                           ))
                       ) : (
-                        <Skeleton variant='rectangular' height={118} />
+                        <> {skeleton}</>
                       )}
                       <Collapse in={open} timeout='auto' unmountOnExit>
-                        {topPicks.length > 0 &&
-                          topPicks.slice(3, 5).map((i) => (
-                            <ListItem
-                              key={i.id}
-                              sx={{
-                                display: "flex",
-                                justifyContent: "space-between",
-                                width: "100%",
-                              }}
-                            >
-                              <Typography>{i.name}</Typography>
-                              <Typography variant='code'>
-                                {/* {USDPrice.shift((i) => i).toFixed(4)} */}
-                              </Typography>
-                            </ListItem>
-                          ))}
+                        {Object.values(topPicks).length > 0 &&
+                          Object.values(topPicks)
+                            .slice(3, 5)
+                            .map((i) => (
+                              <ListItem
+                                key={i.id}
+                                sx={{
+                                  display: "flex",
+                                  justifyContent: "space-between",
+                                  width: "100%",
+                                }}
+                              >
+                                <Typography>{i.name}</Typography>
+                                <Typography variant='code'>
+                                  USD <strong>{i.quote["USD"].price}</strong>
+                                </Typography>
+                              </ListItem>
+                            ))}
                       </Collapse>
                     </List>
                   </CardContent>
                   <CardActions>
-                    {topPicks.length > 0 ? (
+                    {Object.values(topPicks).length > 0 ? (
                       <Button onClick={handleOpen} size='small' color='primary'>
                         {open ? <ExpandLess /> : <ExpandMore />}
                       </Button>
@@ -350,13 +343,16 @@ function Home() {
           <Grid item lg>
             <Box>
               <Typography variant='h3' p={1} sx={{ textAlign: "center" }}>
-                BTC Dominance
+                Market Cap dominance
               </Typography>
               <HighchartsReact
                 ref={chart}
                 options={options}
                 highcharts={Highcharts}
               />
+              {skeleton}
+              {skeleton}
+              <br />
             </Box>
           </Grid>
         </Grid>
