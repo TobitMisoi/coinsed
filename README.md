@@ -42,6 +42,7 @@ You don't have to ever use `eject`. The curated feature set is suitable for smal
 
 ## Home page
 Prerequisites:
+
 [Allow Cors extension](https://chrome.google.com/webstore/detail/allow-cors-access-control/lhobafahddgcelffkeicbaginigeejlf?hl=en) - Simply activate the add-on and perform the request. CORS or Cross Origin Resource Sharing is blocked in modern browsers by default (in JavaScript APIs). By allowing CORS you will be able to view data from the API.
 
 [![Watch the video](https://i.imgur.com/vKb2F1B.png)](https://youtu.be/e309TZ5Atcw)
@@ -49,6 +50,7 @@ Prerequisites:
 
 ## Dashboard 
 Prerequisites
+
 [Metamask extension](https://chrome.google.com/webstore/detail/metamask/nkbihfbeogaeaoehlefnkodbefgpgknn?hl=en) - to be able to connect Wallet and access the balances.
 
 [![Watch the video](https://i.imgur.com/vKb2F1B.png)](https://youtu.be/W7DOAojj8N0)
@@ -62,5 +64,12 @@ Prerequisites
   [https://auth0.com/docs/api](Auth0)
   
   The Authentication API enables you to manage all aspects of user identity when you use Auth0. It offers endpoints so your users can log in, sign up, log out, access APIs, and more.
+  
+  ### Coinsed Technologies
+  
+  [MUI(material-ui)](https://mui.com/) - MUI provides a robust, customizable, and accessible library of foundational and advanced components, enabling you to build your own design system and develop React applications faster.
+  
+  [Metamask extension](https://thirdweb.com/) - This tool allows for the intergration of dApp in the Dashboard. It easily allows for the implementation of web3 features
+  
  
  
