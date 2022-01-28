@@ -57,5 +57,6 @@
   },
   "devDependencies": {
     "sass-loader": "^10"
-  }
+  },
+  "proxy": "https://pro-api.coinmarketcap.com"
 }
